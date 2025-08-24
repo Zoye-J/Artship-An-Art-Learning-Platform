@@ -1,62 +1,72 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\CourseMaterialController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MyCourseController;
 
-Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+// Public routes
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Authentication routes
+require __DIR__.'/auth.php';
 
-Route::middleware(['auth'])->group(function () {
+
+
+// Authenticated routes (all users)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/courses', function () {
-        return view('courses.index');
-    })->name('courses.index');
-
-    Route::get('/wishlist', function () {
-        return view('wishlist.index');
-    })->name('wishlist.index');
-});
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-});
-Route::middleware(['auth'])->group(function () {
-    Route::resource('courses', CourseController::class)->middleware('auth');
-
+    // Course routes - accessible to all authenticated users
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
 
-    Route::middleware('admin')->group(function () {
-        Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
-        Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
-        Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
-        Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
-    });
-Route::middleware(['auth'])->group(function () {
+    // Materials routes - accessible to all authenticated users
+    Route::get('/courses/{course}/materials', [CourseMaterialController::class, 'index'])->name('courses.materials.index');
+
+    // Wishlist routes
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{courseId}', [WishlistController::class, 'store'])->name('wishlist.store');
     Route::delete('/wishlist/{courseId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
-    });
+
+
+    // Course enrollment
+    Route::post('/courses/{id}/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
+    Route::delete('/courses/{course}/unenroll', [CourseController::class, 'unenroll'])
+    ->name('courses.unenroll')
+    ->middleware('auth');
+
+    // My Courses
+    Route::get('/my-courses', [MyCourseController::class, 'index'])->name('my.courses');
+
+    Route::post('/courses/{course}/materials/{material}/view', [CourseController::class, 'markAsViewed'])
+    ->name('materials.view')
+    ->middleware('auth');
+
 });
 
+// ADMIN-ONLY ROUTES (require admin role)
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Admin course management
+    Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
 
-
-
-require __DIR__.'/auth.php';
+    // Admin material management
+    Route::get('/courses/{course}/materials/create', [CourseMaterialController::class, 'create'])->name('courses.materials.create');
+    Route::post('/courses/{course}/materials', [CourseMaterialController::class, 'store'])->name('courses.materials.store');
+    Route::delete('/materials/{material}', [CourseMaterialController::class, 'destroy'])->name('materials.destroy');
+});

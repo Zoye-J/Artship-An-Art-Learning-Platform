@@ -22,6 +22,23 @@ class Course extends Model
     {
         return $this->hasMany(Wishlist::class);
     }
+    public function materials()
+    {
+        return $this->hasMany(CourseMaterial::class);
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'enrollments');
+    }
+
+    
+
 
 
 

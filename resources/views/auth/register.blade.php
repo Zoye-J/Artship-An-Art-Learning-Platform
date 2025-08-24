@@ -67,7 +67,7 @@
 
         <!-- Register Button -->
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="bg-amber-700 hover:bg-amber-600 text-white">
+            <x-primary-button class="bg-orange-300 hover:bg-amber-600 text-white">
                 {{ __('Register') }}
             </x-primary-button>
         </div>

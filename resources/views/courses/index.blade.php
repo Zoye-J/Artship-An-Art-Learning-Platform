@@ -8,12 +8,12 @@
 
 @section('content')
 <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold text-brown-800 mb-6">Courses</h1>
+    <h1 class="text-3xl font-bold text-amber-200 mb-6">Courses</h1>
     
     {{-- Category Filter --}}
     <div class="mb-4">
     <form method="GET" action="{{ route('courses.index') }}" class="mb-4">
-        <label for="category" class="font-semibold text-brown-800">Filter by Category:</label>
+        <label for="category" class="font-semibold text-amber-200">Filter by Category:</label>
         <select name="category" id="category" onchange="this.form.submit()" class="ml-2 px-3 py-1 border rounded">
             <option value="">All</option>
             <option value="Digital" {{ request('category') == 'Digital' ? 'selected' : '' }}>Digital</option>
@@ -29,13 +29,13 @@
     @auth
         @if(auth()->user()->role === 'admin')
             <div class="mb-4">
-                <a href="{{ route('courses.create') }}" class="bg-amber-700 text-white px-4 py-2 rounded shadow hover:bg-amber-500">
+                <a href="{{ route('courses.create') }}" class="bg-amber-200 text-amber-700 px-4 py-2 rounded shadow hover:bg-amber-500">
                     ➕ Add New Course
                 </a>
             </div>
         @endif
     @endauth
-    <p class="text-red-600">Current filter: {{ request('category') }}</p>
+    <p class="text-black">Current filter: {{ request('category') }}</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($courses as $course)
@@ -77,6 +77,27 @@
                                     </button>
                                 </form>
                             @endif
+                        
+                            @if(Auth::check() && Auth::user()->role === 'user')
+                                @if(Auth::user()->courses->contains($course->id))
+                                {{-- Already enrolled --}}
+                                <button type="button" class="bg-green-500 text-white px-4 py-2 rounded cursor-default" disabled>
+                                    Enrolled
+                                </button>
+                            @else
+                                {{-- Show enroll button if not yet enrolled --}}
+                                <form action="{{ route('courses.enroll', $course->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                                        Enroll
+                                    </button>
+                                    </form>
+                                @endif
+                            @endif
+
+ 
+                           
+
                         @endif
 
                         {{-- Admin delete option --}}

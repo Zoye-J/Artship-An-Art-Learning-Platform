@@ -1,7 +1,8 @@
 <x-guest-layout>
+    
 
     <!-- Logo -->
-    <div class="flex justify-center mb-4">
+    <div class="flex justify-center mb-4 ">
         <img src="{{ asset('images/logo.png') }}" alt="Artship Logo" class="h-28">
     </div>
     <h2 class="text-center text-brown-800 text-2xl font-semibold mb-4">Welcome Back to Artship</h2>
@@ -47,7 +48,7 @@
                 </a>
             @endif
 
-            <x-primary-button class="bg-amber-700 hover:bg-amber-600 text-white">
+            <x-primary-button class="bg-orange-300 hover:bg-amber-600 text-white hover:text-amber-900">
                 Log in
             </x-primary-button>
         </div>

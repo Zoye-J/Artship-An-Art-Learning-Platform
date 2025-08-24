@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<h2 class="text-2xl font-bold mb-4">My Wishlist</h2>
+<h2 class="text-2xl text-amber-200 font-bold mb-4">My Wishlist</h2>
 
 @if($wishlistCourses->isEmpty())
     <p>You have no courses in your wishlist.</p>

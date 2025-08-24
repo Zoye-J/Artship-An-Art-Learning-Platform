@@ -155,6 +155,7 @@ return [
     */
 
     'providers' => [
+        App\Providers\AuthServiceProvider::class,
 
         /*
          * Laravel Framework Service Providers...

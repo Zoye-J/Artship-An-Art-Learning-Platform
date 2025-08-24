@@ -47,5 +47,20 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'enrollments');
+    }
+
+        // app/Models/User.php
+    public function viewedMaterials()
+    {
+        return $this->hasMany(ViewedMaterial::class);
+    }
 
 }
