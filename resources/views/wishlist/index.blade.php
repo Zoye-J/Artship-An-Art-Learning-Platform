@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('content')
 <h2 class="text-2xl text-amber-200 font-bold mb-4">My Wishlist</h2>

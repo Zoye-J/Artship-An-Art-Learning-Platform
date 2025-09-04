@@ -37,7 +37,20 @@ class Course extends Model
         return $this->belongsToMany(User::class, 'enrollments');
     }
 
-    
+    public function ratings()
+    {
+        return $this->hasMany(CourseRating::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating');
+    }
+
+    public function totalReviews()
+    {
+        return $this->ratings()->count();
+    }
 
 
 

@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
     @section('header')
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             Courses
@@ -41,6 +41,23 @@
         @forelse($courses as $course)
             <a href="{{ route('courses.show', $course->id) }}" class="block hover:shadow-lg transition duration-300 rounded overflow-hidden">
                 <div class="bg-white p-4 border rounded shadow h-full flex flex-col justify-between">
+                     <!-- Add rating display -->
+                    @if($course->averageRating())
+                        <div class="mt-2">
+                            <div class="flex text-yellow-400 text-sm">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= round($course->averageRating()))
+                                        ⭐
+                                    @else
+                                        ☆
+                                    @endif
+                                @endfor
+                            </div>
+                            <p class="text-xs text-gray-600 mt-1">
+                                {{ number_format($course->averageRating(), 1) }} ({{ $course->totalReviews() }} reviews)
+                            </p>
+                        </div>
+                    @endif
                     @if($course->thumbnail)
                         <img src="{{ asset($course->thumbnail) }}"
                             alt="Course Thumbnail"

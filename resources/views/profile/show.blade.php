@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('content')
     <h2 class="text-2xl font-bold mb-4">Profile Settings</h2>

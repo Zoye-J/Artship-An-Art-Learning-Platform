@@ -1,11 +1,15 @@
 <?php
 
+use App\Models\ArtworkSubmission;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CourseMaterialController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MyCourseController;
+use App\Http\Controllers\ArtworkController;
+use App\Http\Controllers\CourseRatingController;
+
 
 // Public routes
 Route::get('/', function () {
@@ -15,15 +19,56 @@ Route::get('/', function () {
 // Authentication routes
 require __DIR__.'/auth.php';
 
+Route::put('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
+
+Route::get('/dashboard', function () {
+    try {
+        // Try to get featured artworks with relationships
+        $featuredArtworks = ArtworkSubmission::with(['user', 'course'])
+            ->where('is_featured', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        logger('Found ' . $featuredArtworks->count() . ' featured artworks');
+        
+    } catch (\Exception $e) {
+        logger('Error fetching featured artworks: ' . $e->getMessage());
+        $featuredArtworks = collect([]);
+    }
+    
+    return view('dashboard', compact('featuredArtworks'));
+})->middleware(['auth'])->name('dashboard');
+
+Route::post('/courses/{course}/rate', [CourseRatingController::class, 'store'])
+    ->name('courses.rate');
 
 
-// Authenticated routes (all users)
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+// ADMIN-ONLY ROUTES (require admin role)
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Admin course management
 
+    Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
+
+    // Admin material management
+    Route::get('/courses/{course}/materials/create', [CourseMaterialController::class, 'create'])->name('courses.materials.create');
+    Route::post('/courses/{course}/materials', [CourseMaterialController::class, 'store'])->name('courses.materials.store');
+    Route::delete('/materials/{material}', [CourseMaterialController::class, 'destroy'])->name('materials.destroy');
+
+    // Admin artwork management
+    Route::get('/admin/submissions', [ArtworkController::class, 'index'])->name('artwork.index');
+    Route::post('/artwork/{artwork}/feature', [ArtworkController::class, 'feature'])->name('artwork.feature');
+    Route::post('/artwork/{artwork}/unfeature', [ArtworkController::class, 'unfeature'])->name('artwork.unfeature');
+
+    Route::get('/admin/feedback', [CourseRatingController::class, 'index'])
+    ->name('admin.feedback')
+    ->middleware(['auth', 'admin']);
+});
+
+
+// AUTHENTICATED USER ROUTES (all logged-in users)
+Route::middleware(['auth'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
@@ -42,31 +87,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/wishlist/{courseId}', [WishlistController::class, 'store'])->name('wishlist.store');
     Route::delete('/wishlist/{courseId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
-
     // Course enrollment
     Route::post('/courses/{id}/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
     Route::delete('/courses/{course}/unenroll', [CourseController::class, 'unenroll'])
-    ->name('courses.unenroll')
-    ->middleware('auth');
+        ->name('courses.unenroll');
 
     // My Courses
     Route::get('/my-courses', [MyCourseController::class, 'index'])->name('my.courses');
 
     Route::post('/courses/{course}/materials/{material}/view', [CourseController::class, 'markAsViewed'])
-    ->name('materials.view')
-    ->middleware('auth');
+        ->name('materials.view');
 
+    // User routes
+    Route::get('/courses/{course}/artwork/create', [ArtworkController::class, 'create'])->name('artwork.create');
+    Route::post('/courses/{course}/artwork', [ArtworkController::class, 'store'])->name('artwork.store');
+    Route::post('/artwork/{artwork}/like', [ArtworkController::class, 'toggleLike'])->name('artwork.like');
 });
 
-// ADMIN-ONLY ROUTES (require admin role)
-Route::middleware(['auth', 'admin'])->group(function () {
-    // Admin course management
-    Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
-    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
-    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
 
-    // Admin material management
-    Route::get('/courses/{course}/materials/create', [CourseMaterialController::class, 'create'])->name('courses.materials.create');
-    Route::post('/courses/{course}/materials', [CourseMaterialController::class, 'store'])->name('courses.materials.store');
-    Route::delete('/materials/{material}', [CourseMaterialController::class, 'destroy'])->name('materials.destroy');
-});

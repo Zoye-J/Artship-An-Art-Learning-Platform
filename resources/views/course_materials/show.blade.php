@@ -34,7 +34,57 @@
             </p>
         </div>
         @endif
+        @if($isEnrolled && $progress >= 80) {{-- Only show when course is mostly complete --}}
+            <div class="text-center mt-8">
+                <a href="{{ route('artwork.create', $course->id) }}" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 inline-block">
+                    🎨 Submit Your Final Artwork
+                </a>
+            </div>
+        @endif
+        @if($isEnrolled && $progress >= 100)
+            <div class="bg-white rounded-2xl shadow-lg p-6 mt-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Rate this course</h3>
+    
+                <form action="{{ route('courses.rate', $course->id) }}" method="POST">
+                    @csrf
+        
+        <!-- Star Rating -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Your rating:</label>
+                        <div class="flex space-x-1">
+                            @for($i = 1; $i <= 5; $i++)
+                                <button type="button" onclick="setRating({{ $i }})" class="text-2xl rating-star" data-rating="{{ $i }}">
+                                    ☆
+                                </button>
+                            @endfor
+                        </div>
+                        <input type="hidden" name="rating" id="rating-value" value="0" required>
+                    </div>
 
+        <!-- Review -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Your review (optional):</label>
+                        <textarea name="review" rows="3" class="w-full border border-gray-300 rounded-lg p-3" 
+                            placeholder="Share your experience with this course..."></textarea>
+                    </div>
+
+                    <button type="submit" class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
+                        Submit Rating
+                    </button>
+                </form>
+            </div>
+
+            <script>
+            function setRating(rating) {
+                document.getElementById('rating-value').value = rating;
+    
+    // Update star display
+                document.querySelectorAll('.rating-star').forEach((star, index) => {
+                    star.textContent = (index + 1) <= rating ? '⭐' : '☆';
+                });
+            }
+            </script>
+            @endif
         <!-- Materials Container with Tabs -->
         <div class="bg-yellow-200 rounded-3xl shadow-2xl overflow-hidden mb-8">
             <!-- Tabs Navigation -->

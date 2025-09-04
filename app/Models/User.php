@@ -63,4 +63,9 @@ class User extends Authenticatable
         return $this->hasMany(ViewedMaterial::class);
     }
 
+    public function courseRatings()
+    {
+        return $this->hasMany(CourseRating::class);
+    }
+
 }
