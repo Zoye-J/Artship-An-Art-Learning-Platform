@@ -46,6 +46,17 @@ class ArtworkController extends Controller
         return redirect()->route('courses.show', $course->id)
             ->with('success', 'Artwork submitted successfully! It will be reviewed by admins.');
     }
+    public function markAsViewed(ArtworkSubmission $artwork)
+    {
+        $artwork->update(['viewed_at' => now()]);
+        return response()->json(['success' => true]);
+    }
+
+    public function markAllViewed()
+    {
+        ArtworkSubmission::whereNull('viewed_at')->update(['viewed_at' => now()]);
+        return response()->json(['success' => true]);
+    }
 
     // Admin: View all submissions
     public function index()

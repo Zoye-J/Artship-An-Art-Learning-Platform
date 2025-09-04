@@ -64,6 +64,17 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/feedback', [CourseRatingController::class, 'index'])
     ->name('admin.feedback')
     ->middleware(['auth', 'admin']);
+    // Artwork viewing routes
+    Route::post('/artwork/{artwork}/mark-viewed', [ArtworkController::class, 'markAsViewed'])
+    ->name('artwork.mark-viewed');
+    Route::post('/artwork/mark-all-viewed', [ArtworkController::class, 'markAllViewed'])
+    ->name('artwork.mark-all-viewed');
+
+    // Feedback viewing routes  
+    Route::post('/feedback/{rating}/mark-viewed', [CourseRatingController::class, 'markAsViewed'])
+    ->name('feedback.mark-viewed');
+    Route::post('/feedback/mark-all-viewed', [CourseRatingController::class, 'markAllViewed'])
+    ->name('feedback.mark-all-viewed');
 });
 
 

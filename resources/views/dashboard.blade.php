@@ -18,7 +18,7 @@
                 <a href="{{ route('profile.show') }}">
                     <img src="{{ asset('images/profile.png') }}"
                         alt="Profile"
-                        class="w-16 h-16 rounded-full border-4 border-amber-300 shadow">
+                        class="w-20 h-20 rounded-full border-4 border-amber-300 shadow">
                 </a>
             </div>
 
@@ -33,28 +33,34 @@
                     <a href="{{ route('wishlist.index') }}" class="hover:bg-amber-200 p-2 rounded">Wishlist</a>
                 @endif
                 @if(auth()->check() && auth()->user()->role === 'admin')
-                    <a href="{{ route('artwork.index') }}" class="hover:bg-amber-200 p-2 rounded">
-                            Submissions
                         @php
-                            $pendingCount = \App\Models\ArtworkSubmission::where('is_featured', false)->count();
+                            $pendingSubmissions = \App\Models\ArtworkSubmission::unviewed()->count();
                         @endphp
-                        @if($pendingCount > 0)
-                            <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                                {{ $pendingCount }}
-                            </span>
-                        @endif
-                    </a>
-                    <!-- ADD THIS FEEDBACK LINK -->
-                    <a href="{{ route('admin.feedback') }}" class="hover:bg-amber-200 p-2 rounded ">
-                            Feedback
+
+                        <a href="{{ route('artwork.index') }}" class="hover:bg-amber-200 p-2 rounded flex items-center">
+                                Submissions
+                            @if($pendingSubmissions > 0)
+                                <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full" id="submissions-badge">
+                                    {{ $pendingSubmissions }} new
+                                </span>
+                            @endif
+                        </a>
+                    
+                    <!-- FEEDBACK LINK -->
+            
                         @php
-                            $newReviews = \App\Models\CourseRating::where('created_at', '>=', now()->subDays(7))->count();
+                            $newFeedback = \App\Models\CourseRating::unviewed()->count();
                         @endphp
-                        @if($newReviews > 0)
-                            <span class="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                                {{ $newReviews }} new
-                            </span>
-                        @endif
+
+                        <a href="{{ route('admin.feedback') }}" class="hover:bg-amber-200 p-2 rounded flex items-center">
+                                Feedback
+                            @if($newFeedback > 0)
+                                <span class="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full" id="feedback-badge">
+                                    {{ $newFeedback }} new
+                                </span>
+                            @endif
+                        </a>   
+               
                 @endif
 
             </nav>

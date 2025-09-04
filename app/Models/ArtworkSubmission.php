@@ -9,7 +9,10 @@ class ArtworkSubmission extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'course_id', 'title', 'description', 'image_path', 'is_featured'];
+    protected $fillable = ['user_id', 'course_id', 'title', 'description', 'image_path', 'is_featured', 'viewed_at'];
+    protected $casts = [
+    'viewed_at' => 'datetime'
+    ];
 
     public function user()
     {
@@ -34,6 +37,11 @@ class ArtworkSubmission extends Model
         }
         
         return $this->likes()->where('user_id', auth()->id())->exists();
+    }
+
+    public function scopeUnviewed($query)
+    {
+        return $query->whereNull('viewed_at');
     }
     
 }

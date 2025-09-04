@@ -9,8 +9,10 @@ class CourseRating extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'course_id', 'rating', 'review'];
-
+    protected $fillable = ['user_id', 'course_id', 'rating', 'review',  'viewed_at'];
+    protected $casts = [
+    'viewed_at' => 'datetime'
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -19,5 +21,9 @@ class CourseRating extends Model
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+    public function scopeUnviewed($query)
+    {
+        return $query->whereNull('viewed_at');
     }
 }

@@ -35,6 +35,18 @@ class CourseRatingController extends Controller
         return back()->with('success', 'Thank you for your rating!');
     }
 
+    public function markAsViewed(CourseRating $rating)
+    {
+        $rating->update(['viewed_at' => now()]);
+        return response()->json(['success' => true]);
+    }
+
+    public function markAllViewed()
+    {
+        CourseRating::whereNull('viewed_at')->update(['viewed_at' => now()]);
+        return response()->json(['success' => true]);
+    }
+
     public function index()
     {
         $courses = Course::with(['ratings.user', 'enrollments'])

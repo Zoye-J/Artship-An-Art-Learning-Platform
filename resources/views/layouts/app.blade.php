@@ -35,3 +35,35 @@
         </div>
     </body>
 </html>
+@if(auth()->check() && auth()->user()->role === 'admin')
+<script>
+// Auto-mark as viewed for admin pages
+document.addEventListener('DOMContentLoaded', function() {
+    // Submissions page
+    if (window.location.pathname.includes('admin/submissions')) {
+        fetch('/artwork/mark-all-viewed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        }).then(() => {
+            document.getElementById('submissions-badge')?.remove();
+        });
+    }
+
+    // Feedback page  
+    if (window.location.pathname.includes('admin/feedback')) {
+        fetch('/feedback/mark-all-viewed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        }).then(() => {
+            document.getElementById('feedback-badge')?.remove();
+        });
+    }
+});
+</script>
+@endif
